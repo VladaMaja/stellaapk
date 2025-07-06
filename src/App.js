@@ -6,23 +6,36 @@ export default function App() {
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
 
+  // Lista biljaka, slike upiši prema imenima fajlova
   const proizvodi = [
-    { ime: 'Brokoli', cena: 150, status: 'Dostupno', slika: 'brokoli.jpg' },
-    { ime: 'Bosiljak', cena: 130, status: 'Nije dostupno', slika: 'bosiljak.jpg' },
-    { ime: 'Cvekla', cena: 140, status: 'Dostupno', slika: 'cvekla.jpg' },
-    { ime: 'Kineska rotkvica', cena: 120, status: 'Dostupno', slika: 'kineska_rotkvica.jpg' },
-    { ime: 'Rukola', cena: 150, status: 'Nije dostupno', slika: 'rukola.jpg' },
-    { ime: 'Lan', cena: 110, status: 'Dostupno', slika: 'lan.jpg' },
-    { ime: 'Vlasac', cena: 130, status: 'Dostupno', slika: 'vlasac.jpg' },
-    { ime: 'Grašak', cena: 140, status: 'Nije dostupno', slika: 'grasak.jpg' },
-    { ime: 'Lucerka', cena: 120, status: 'Dostupno', slika: 'lucerka.jpg' },
-    { ime: 'Šargarepa', cena: 150, status: 'Dostupno', slika: 'sargarepa.jpg' },
-    { ime: 'Korijander', cena: 130, status: 'Dostupno', slika: 'korijander.jpg' },
-    { ime: 'Slačica', cena: 110, status: 'Dostupno', slika: 'slacica.jpg' },
+    { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
+    { ime: 'Bosiljak', status: 'Dostupno', slika: 'bosiljak.jpg' },
+    { ime: 'Cvekla', status: 'Dostupno', slika: 'cvekla.jpg' },
+    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska_rotkvica.jpg' },
+    { ime: 'Rukola', status: 'Dostupno', slika: 'rukola.jpg' },
+    { ime: 'Lan', status: 'Dostupno', slika: 'lan.jpg' },
+    { ime: 'Vlasac', status: 'Dostupno', slika: 'vlasac.jpg' },
+    { ime: 'Grašak', status: 'Dostupno', slika: 'grasak.jpg' },
+    { ime: 'Lucerka', status: 'Dostupno', slika: 'lucerka.jpg' },
+    { ime: 'Šargarepa', status: 'Dostupno', slika: 'sargarepa.jpg' },
+    { ime: 'Korijander', status: 'Dostupno', slika: 'korijander.jpg' },
+    { ime: 'Slačica', status: 'Dostupno', slika: 'slacica.jpg' },
   ];
 
+  const [odabranaGramaza, setOdabranaGramaza] = useState({}); // čuva izabranu gramažu po biljci
+
+  const cene = {
+    '30g': 250,
+    '50g': 400,
+  };
+
   const dodajUkorpu = (proizvod) => {
-    setPorudzbina([...porudzbina, proizvod]);
+    const gramaza = odabranaGramaza[proizvod.ime] || '30g';
+    setPorudzbina([...porudzbina, {
+      ...proizvod,
+      gramaza,
+      cena: cene[gramaza]
+    }]);
   };
 
   const ukloniProizvod = (index) => {
@@ -43,7 +56,7 @@ export default function App() {
 
     const orders = porudzbina.map(p => ({
       name: p.ime,
-      units: 1,
+      gramaza: p.gramaza,
       price: p.cena,
     }));
 
@@ -51,7 +64,7 @@ export default function App() {
 
     const templateParams = {
       order_id: Math.floor(Math.random() * 100000),
-      orders: orders,
+      orders: orders.map(o => `${o.name} (${o.gramaza}) - ${o.price} RSD`).join('\n'),
       price: totalPrice,
       email: email.trim()
     };
@@ -70,7 +83,6 @@ export default function App() {
 
   return (
     <div className="p-4 min-h-screen bg-[#fdf3e7] text-green-800 font-sans">
-
       <header className="mb-8 text-center">
         <img
           src="/logo.jpg"
@@ -86,13 +98,25 @@ export default function App() {
           {proizvodi.map((p, i) => (
             <div key={i} className="border border-green-100 rounded-2xl bg-white shadow p-4">
               <img
-                src={`/images/{p.slika}`}
+                src={`/images/${p.slika}`}
                 alt={p.ime}
                 className="w-full h-32 object-cover rounded-xl mb-2"
               />
               <h3 className="text-lg font-bold mb-1">{p.ime}</h3>
-              <p className="text-sm">{p.cena} RSD</p>
-              <p className={`text-xs mt-1 {p.status === 'Dostupno' ? 'text-green-600' : 'text-red-500'}`}>
+              <div className="mb-1">
+                <label className="mr-2 font-medium">Gramaža:</label>
+                <select
+                  value={odabranaGramaza[p.ime] || '30g'}
+                  onChange={e =>
+                    setOdabranaGramaza({ ...odabranaGramaza, [p.ime]: e.target.value })
+                  }
+                  className="border rounded px-2 py-1"
+                >
+                  <option value="30g">30g - 250 RSD</option>
+                  <option value="50g">50g - 400 RSD</option>
+                </select>
+              </div>
+              <p className={`text-xs mt-1 ${p.status === 'Dostupno' ? 'text-green-600' : 'text-red-500'}`}>
                 {p.status}
               </p>
               <button
@@ -115,7 +139,7 @@ export default function App() {
           <ul className="list-disc pl-4 space-y-1">
             {porudzbina.map((item, i) => (
               <li key={i} className="flex items-center justify-between">
-                <span>{item.ime} - {item.cena} RSD</span>
+                <span>{item.ime} - {item.gramaza} - {item.cena} RSD</span>
                 <button
                   onClick={() => ukloniProizvod(i)}
                   className="text-red-600 text-xs hover:underline"
@@ -151,7 +175,6 @@ export default function App() {
           </div>
         )}
       </section>
-
     </div>
   );
 }
