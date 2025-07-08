@@ -11,15 +11,15 @@ export default function App() {
     { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
     { ime: 'Bosiljak', status: 'Dostupno', slika: 'bosiljak.jpg' },
     { ime: 'Cvekla', status: 'Dostupno', slika: 'cvekla.jpg' },
-    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska_rotkvica.jpg' },
+    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska rotkvica.jpg' },
     { ime: 'Rukola', status: 'Dostupno', slika: 'rukola.jpg' },
     { ime: 'Lan', status: 'Dostupno', slika: 'lan.jpg' },
-    { ime: 'Vlasac', status: 'Dostupno', slika: 'vlasac.jpg' },
-    { ime: 'Grašak', status: 'Dostupno', slika: 'grasak.jpg' },
+    { ime: 'Vlašac', status: 'Dostupno', slika: 'vlašac.jpg' },
+    { ime: 'Grašak', status: 'Dostupno', slika: 'grašak.jpg' },
     { ime: 'Lucerka', status: 'Dostupno', slika: 'lucerka.jpg' },
-    { ime: 'Šargarepa', status: 'Dostupno', slika: 'sargarepa.jpg' },
+    { ime: 'Šargarepa', status: 'Dostupno', slika: 'šargarepa.jpg' },
     { ime: 'Korijander', status: 'Dostupno', slika: 'korijander.jpg' },
-    { ime: 'Slačica', status: 'Dostupno', slika: 'slacica.jpg' },
+    { ime: 'Slačica', status: 'Dostupno', slika: 'slačica.jpg' },
   ];
 
   const [odabranaGramaza, setOdabranaGramaza] = useState({}); // čuva izabranu gramažu po biljci
