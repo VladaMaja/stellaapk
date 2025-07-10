@@ -7,6 +7,7 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [prikaziInfo, setPrikaziInfo] = useState(null);
 
+  // Dodaj ili izmeni status: 'Dostupno', 'Nije dostupno', 'Uskoro'
   const proizvodi = [
     {
       ime: 'Brokoli',
@@ -16,13 +17,13 @@ export default function App() {
     },
     {
       ime: 'Bosiljak',
-      status: 'Dostupno',
+      status: 'Uskoro',
       slika: 'bosiljak.jpg',
       info: `• Sadrži vitamine K, A, magnezijum\n• Dobar za varenje, smanjuje upale\n• Ne preporučuje se osobama alergičnim na bosiljak`
     },
     {
       ime: 'Cvekla',
-      status: 'Dostupno',
+      status: 'Nije dostupno',
       slika: 'cvekla.jpg',
       info: `• Izvor folata, gvožđa, betaina\n• Poboljšava cirkulaciju i podržava jetru\n• Oprez kod bubrežnih bolesnika (oksalati)`
     },
@@ -36,7 +37,7 @@ export default function App() {
       ime: 'Rukola',
       status: 'Dostupno',
       slika: 'rukola.jpg',
-      info: `• Izuzetno bogata vitaminima K, C\n• Pomaže varenje, sadrži gorke materije korisne za jetru\n• Može izazvati tegobe kod osoba sa osjetljivim želucem`
+      info: `• Izuzetno bogata vitaminima K, C\n• Pomaže varenje, sadrži gorke materije korisne za jetru\n• Može izazvati tegobe kod osoba sa osetljivim želucem`
     },
     {
       ime: 'Lan',
@@ -46,7 +47,7 @@ export default function App() {
     },
     {
       ime: 'Vlašac',
-      status: 'Dostupno',
+      status: 'Uskoro',
       slika: 'vlašac.jpg',
       info: `• Bogat vitaminom K i folatima\n• Dobar za kosti i krvne sudove\n• Oprez kod osoba alergičnih na lukovice`
     },
@@ -54,7 +55,7 @@ export default function App() {
       ime: 'Grašak',
       status: 'Dostupno',
       slika: 'grašak.jpg',
-      info: `• Izvor proteina, vitamina B, C, E\n• Pomaže oporavak mišića i radu creva\n• Oprez kod osoba skloni stvaranju gasova`
+      info: `• Izvor proteina, vitamina B, C, E\n• Pomaže oporavak mišića i radu creva\n• Oprez kod osoba sklonih stvaranju gasova`
     },
     {
       ime: 'Lucerka',
@@ -164,8 +165,14 @@ export default function App() {
                   <option value="50g">50g - 400 RSD</option>
                 </select>
               </div>
-              <p className={`text-xs mt-1 ${p.status === 'Dostupno' ? 'text-green-600' : 'text-red-500'}`}>
-                {p.status}
+              <p className={`text-xs mt-1 ${
+                p.status === 'Dostupno'
+                  ? 'text-green-600'
+                  : p.status === 'Uskoro'
+                  ? 'text-yellow-600'
+                  : 'text-red-500'
+              }`}>
+                {p.status === 'Uskoro' ? 'Uskoro u ponudi' : p.status}
               </p>
               <button
                 onClick={() => setPrikaziInfo(i)}
@@ -175,10 +182,18 @@ export default function App() {
               </button>
               <button
                 onClick={() => dodajUkorpu(p)}
-                className="mt-3 text-sm bg-green-200 hover:bg-green-300 text-green-900 px-3 py-1 rounded-xl"
+                className={`mt-3 text-sm px-3 py-1 rounded-xl 
+                  ${p.status === 'Dostupno'
+                    ? 'bg-green-200 hover:bg-green-300 text-green-900'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
+                `}
                 disabled={p.status !== 'Dostupno'}
               >
-                Dodaj u narudžbinu
+                {p.status === 'Uskoro'
+                  ? 'Nedostupno'
+                  : p.status === 'Nije dostupno'
+                  ? 'Nedostupno'
+                  : 'Dodaj u narudžbinu'}
               </button>
             </div>
           ))}
