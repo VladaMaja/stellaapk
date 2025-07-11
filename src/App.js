@@ -11,7 +11,7 @@ export default function App() {
 
   // Sve biljke "Uskoro dostupno" (možeš kasnije promeniti po potrebi)
   const proizvodi = [
-    { ime: 'Brokoli', status: 'Uskoro dostupno', slika: 'brokoli.jpg' },
+    { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
     { ime: 'Bosiljak', status: 'Uskoro dostupno', slika: 'bosiljak.jpg' },
     { ime: 'Cvekla', status: 'Uskoro dostupno', slika: 'cvekla.jpg' },
     { ime: 'Kineska rotkvica', status: 'Uskoro dostupno', slika: 'kineska rotkvica.jpg' },
