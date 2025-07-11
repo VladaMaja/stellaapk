@@ -5,82 +5,22 @@ export default function App() {
   const [porudzbina, setPorudzbina] = useState([]);
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
-  const [prikaziInfo, setPrikaziInfo] = useState(null);
+  const [imePrezime, setImePrezime] = useState('');
+  const [telefon, setTelefon] = useState('');
 
-  // Dodaj ili izmeni status: 'Dostupno', 'Nije dostupno', 'Uskoro'
   const proizvodi = [
-    {
-      ime: 'Brokoli',
-      status: 'Dostupno',
-      slika: 'brokoli.jpg',
-      info: `• Bogat vitaminima C, K, A i antioksidansima\n• Jača imunitet, podržava detoksikaciju\n• Preporučuje se svima, uz oprez kod osoba na antikoagulantima`
-    },
-    {
-      ime: 'Bosiljak',
-      status: 'Uskoro',
-      slika: 'bosiljak.jpg',
-      info: `• Sadrži vitamine K, A, magnezijum\n• Dobar za varenje, smanjuje upale\n• Ne preporučuje se osobama alergičnim na bosiljak`
-    },
-    {
-      ime: 'Cvekla',
-      status: 'Nije dostupno',
-      slika: 'cvekla.jpg',
-      info: `• Izvor folata, gvožđa, betaina\n• Poboljšava cirkulaciju i podržava jetru\n• Oprez kod bubrežnih bolesnika (oksalati)`
-    },
-    {
-      ime: 'Kineska rotkvica',
-      status: 'Dostupno',
-      slika: 'kineska rotkvica.jpg',
-      info: `• Puna vitamina C i sumpornih jedinjenja\n• Podstiče probavu i čisti organizam\n• Ne preporučuje se kod problema sa štitnom žlezdom`
-    },
-    {
-      ime: 'Rukola',
-      status: 'Dostupno',
-      slika: 'rukola.jpg',
-      info: `• Izuzetno bogata vitaminima K, C\n• Pomaže varenje, sadrži gorke materije korisne za jetru\n• Može izazvati tegobe kod osoba sa osetljivim želucem`
-    },
-    {
-      ime: 'Lan',
-      status: 'Dostupno',
-      slika: 'lan.jpg',
-      info: `• Bogat omega-3 masnim kiselinama i vlaknima\n• Podržava rad srca i varenja\n• Oprez kod osoba sa zapaljenskim bolestima creva`
-    },
-    {
-      ime: 'Vlašac',
-      status: 'Uskoro',
-      slika: 'vlašac.jpg',
-      info: `• Bogat vitaminom K i folatima\n• Dobar za kosti i krvne sudove\n• Oprez kod osoba alergičnih na lukovice`
-    },
-    {
-      ime: 'Grašak',
-      status: 'Dostupno',
-      slika: 'grašak.jpg',
-      info: `• Izvor proteina, vitamina B, C, E\n• Pomaže oporavak mišića i radu creva\n• Oprez kod osoba sklonih stvaranju gasova`
-    },
-    {
-      ime: 'Lucerka',
-      status: 'Dostupno',
-      slika: 'lucerka.jpg',
-      info: `• Sadrži vitamine K, C, E, minerale\n• Jača imunitet i smanjuje umor\n• Nije preporučljiva trudnicama zbog fitoestrogena`
-    },
-    {
-      ime: 'Šargarepa',
-      status: 'Dostupno',
-      slika: 'šargarepa.jpg',
-      info: `• Puna beta-karotena, vitamina A\n• Dobro za vid i kožu\n• Oprez kod dijabetičara zbog šećera`
-    },
-    {
-      ime: 'Korijander',
-      status: 'Dostupno',
-      slika: 'korijander.jpg',
-      info: `• Bogat antioksidansima i vitaminom K\n• Podržava varenje i detoksikaciju\n• Oprez kod osoba alergičnih na peršun i slične biljke`
-    },
-    {
-      ime: 'Slačica',
-      status: 'Dostupno',
-      slika: 'slačica.jpg',
-      info: `• Sadrži vitamine A, C, E i minerale\n• Potiče cirkulaciju i probavu\n• Oprez kod čira na želucu`
-    }
+    { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
+    { ime: 'Bosiljak', status: 'Dostupno', slika: 'bosiljak.jpg' },
+    { ime: 'Cvekla', status: 'Dostupno', slika: 'cvekla.jpg' },
+    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska rotkvica.jpg' },
+    { ime: 'Rukola', status: 'Dostupno', slika: 'rukola.jpg' },
+    { ime: 'Lan', status: 'Dostupno', slika: 'lan.jpg' },
+    { ime: 'Vlašac', status: 'Dostupno', slika: 'vlašac.jpg' },
+    { ime: 'Grašak', status: 'Dostupno', slika: 'grašak.jpg' },
+    { ime: 'Lucerka', status: 'Dostupno', slika: 'lucerka.jpg' },
+    { ime: 'Šargarepa', status: 'Dostupno', slika: 'šargarepa.jpg' },
+    { ime: 'Korijander', status: 'Dostupno', slika: 'korijander.jpg' },
+    { ime: 'Slačica', status: 'Dostupno', slika: 'slačica.jpg' },
   ];
 
   const [odabranaGramaza, setOdabranaGramaza] = useState({});
@@ -102,26 +42,42 @@ export default function App() {
       setStatus('Korpa je prazna.');
       return;
     }
+    if (!imePrezime.trim()) {
+      setStatus('Molimo unesite ime i prezime.');
+      return;
+    }
+    if (!telefon.trim()) {
+      setStatus('Molimo unesite broj telefona.');
+      return;
+    }
     if (!email.trim()) {
       setStatus('Molimo unesite vašu email adresu.');
       return;
     }
+
     const orders = porudzbina.map(p => ({
       name: p.ime,
       gramaza: p.gramaza,
       price: p.cena,
     }));
+
     const totalPrice = orders.reduce((acc, item) => acc + item.price, 0);
+
     const templateParams = {
       order_id: Math.floor(Math.random() * 100000),
+      imeprezime: imePrezime,
+      telefon: telefon,
+      email: email.trim(),
       orders: orders.map(o => `${o.name} (${o.gramaza}) - ${o.price} RSD`).join('\n'),
       price: totalPrice,
-      email: email.trim()
     };
+
     emailjs.send('service_nw0o8sd', 'template_2a2f5sr', templateParams, 'OZIzXvYjWtayN02p1')
       .then(() => {
         setStatus('Narudžbina je uspešno poslata!');
         setPorudzbina([]);
+        setImePrezime('');
+        setTelefon('');
         setEmail('');
       })
       .catch((error) => {
@@ -133,73 +89,41 @@ export default function App() {
   return (
     <div className="p-4 min-h-screen bg-[#fdf3e7] text-green-800 font-sans">
       <header className="mb-8 text-center">
-        <img
-          src="/logo.jpg"
-          alt="Stellagreens logo"
-          className="mx-auto w-60 h-auto mb-2"
-        />
+        <img src="/logo.jpg" alt="Stellagreens logo" className="mx-auto w-60 h-auto mb-2" />
         <p className="text-sm text-green-600">Sveže mikrobilje iz lokalne proizvodnje</p>
       </header>
-
       <section>
         <h2 className="text-2xl font-semibold mb-4">Naša ponuda</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {proizvodi.map((p, i) => (
             <div key={i} className="border border-green-100 rounded-2xl bg-white shadow p-4">
-              <img
-                src={`/images/${p.slika}`}
-                alt={p.ime}
-                className="w-full h-32 object-cover rounded-xl mb-2"
-              />
+              <img src={`/images/${p.slika}`} alt={p.ime} className="w-full h-32 object-cover rounded-xl mb-2" />
               <h3 className="text-lg font-bold mb-1">{p.ime}</h3>
               <div className="mb-1">
                 <label className="mr-2 font-medium">Gramaža:</label>
                 <select
                   value={odabranaGramaza[p.ime] || '30g'}
-                  onChange={e =>
-                    setOdabranaGramaza({ ...odabranaGramaza, [p.ime]: e.target.value })
-                  }
+                  onChange={e => setOdabranaGramaza({ ...odabranaGramaza, [p.ime]: e.target.value })}
                   className="border rounded px-2 py-1"
                 >
                   <option value="30g">30g - 250 RSD</option>
                   <option value="50g">50g - 400 RSD</option>
                 </select>
               </div>
-              <p className={`text-xs mt-1 ${
-                p.status === 'Dostupno'
-                  ? 'text-green-600'
-                  : p.status === 'Uskoro'
-                  ? 'text-yellow-600'
-                  : 'text-red-500'
-              }`}>
-                {p.status === 'Uskoro' ? 'Uskoro u ponudi' : p.status}
+              <p className={`text-xs mt-1 ${p.status === 'Dostupno' ? 'text-green-600' : 'text-red-500'}`}>
+                {p.status}
               </p>
               <button
-                onClick={() => setPrikaziInfo(i)}
-                className="mt-2 text-sm bg-green-100 hover:bg-green-200 px-2 py-1 rounded"
-              >
-                Više info
-              </button>
-              <button
                 onClick={() => dodajUkorpu(p)}
-                className={`mt-3 text-sm px-3 py-1 rounded-xl 
-                  ${p.status === 'Dostupno'
-                    ? 'bg-green-200 hover:bg-green-300 text-green-900'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
-                `}
+                className="mt-3 text-sm bg-green-200 hover:bg-green-300 text-green-900 px-3 py-1 rounded-xl"
                 disabled={p.status !== 'Dostupno'}
               >
-                {p.status === 'Uskoro'
-                  ? 'Nedostupno'
-                  : p.status === 'Nije dostupno'
-                  ? 'Nedostupno'
-                  : 'Dodaj u narudžbinu'}
+                Dodaj u narudžbinu
               </button>
             </div>
           ))}
         </div>
       </section>
-
       <section className="mt-10">
         <h2 className="text-2xl font-semibold mb-3">🛒 Tvoja narudžbina</h2>
         {porudzbina.length === 0 ? (
@@ -219,19 +143,38 @@ export default function App() {
             ))}
           </ul>
         )}
-
-        <div className="mt-6">
-          <label htmlFor="email" className="block mb-1 font-medium">Unesite vaš email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full p-2 border border-green-400 rounded"
-            placeholder="primer@domen.com"
-          />
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          <div>
+            <label className="block mb-1 font-medium">Ime i prezime:</label>
+            <input
+              type="text"
+              value={imePrezime}
+              onChange={e => setImePrezime(e.target.value)}
+              className="w-full p-2 border border-green-400 rounded"
+              placeholder="Vaše ime i prezime"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Telefon:</label>
+            <input
+              type="text"
+              value={telefon}
+              onChange={e => setTelefon(e.target.value)}
+              className="w-full p-2 border border-green-400 rounded"
+              placeholder="Kontakt telefon"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full p-2 border border-green-400 rounded"
+              placeholder="primer@domen.com"
+            />
+          </div>
         </div>
-
         {porudzbina.length > 0 && (
           <div className="text-center mt-4">
             <button
@@ -244,24 +187,6 @@ export default function App() {
           </div>
         )}
       </section>
-
-      {/* Modal za više info */}
-      {prikaziInfo !== null && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl max-w-md shadow-lg text-green-900 relative">
-            <h3 className="text-xl font-bold mb-2">
-              {proizvodi[prikaziInfo].ime}
-            </h3>
-            <p className="mb-4 whitespace-pre-line">{proizvodi[prikaziInfo].info}</p>
-            <button
-              onClick={() => setPrikaziInfo(null)}
-              className="absolute top-2 right-2 bg-green-200 hover:bg-green-300 px-3 py-1 rounded"
-            >
-              Zatvori
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
