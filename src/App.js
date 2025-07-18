@@ -5,27 +5,29 @@ export default function App() {
   const [porudzbina, setPorudzbina] = useState([]);
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
-  const [imeprezime, setImeprezime] = useState('');
+  const [imeprezime, setImePrezime] = useState('');
   const [telefon, setTelefon] = useState('');
+  const [odabranaGramaza, setOdabranaGramaza] = useState({});
 
-  // *** SVIH 12 BILJAKA, status: Dostupno ili Uskoro dostupno ***
   const proizvodi = [
     { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
-    { ime: 'Bosiljak', status: 'Uskoro dostupno', slika: 'bosiljak.jpg' },
+    { ime: 'Bosiljak', status: 'Dostupno', slika: 'bosiljak.jpg' },
     { ime: 'Cvekla', status: 'Dostupno', slika: 'cvekla.jpg' },
-    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska rotkvica.jpg' },
+    { ime: 'Kineska rotkvica', status: 'Uskoro dostupno', slika: 'kineska_rotkvica.jpg' },
     { ime: 'Rukola', status: 'Dostupno', slika: 'rukola.jpg' },
     { ime: 'Lan', status: 'Uskoro dostupno', slika: 'lan.jpg' },
-    { ime: 'Vlašac', status: 'Dostupno', slika: 'vlašac.jpg' },
-    { ime: 'Grašak', status: 'Uskoro dostupno', slika: 'grašak.jpg' },
+    { ime: 'Vlašac', status: 'Dostupno', slika: 'vlasac.jpg' },
+    { ime: 'Grašak', status: 'Uskoro dostupno', slika: 'grasak.jpg' },
     { ime: 'Lucerka', status: 'Dostupno', slika: 'lucerka.jpg' },
-    { ime: 'Šargarepa', status: 'Uskoro dostupno', slika: 'šargarepa.jpg' },
+    { ime: 'Šargarepa', status: 'Uskoro dostupno', slika: 'sargarepa.jpg' },
     { ime: 'Korijander', status: 'Dostupno', slika: 'korijander.jpg' },
-    { ime: 'Slačica', status: 'Dostupno', slika: 'slačica.jpg' },
+    { ime: 'Slačica', status: 'Dostupno', slika: 'slacica.jpg' },
   ];
 
-  const [odabranaGramaza, setOdabranaGramaza] = useState({});
-  const cene = { '30g': 250, '50g': 400 };
+  const cene = {
+    '30g': 250,
+    '50g': 400,
+  };
 
   const dodajUkorpu = (proizvod) => {
     const gramaza = odabranaGramaza[proizvod.ime] || '30g';
@@ -48,27 +50,29 @@ export default function App() {
       return;
     }
     if (!imeprezime.trim() || !telefon.trim() || !email.trim()) {
-      setStatus('Molimo unesite ime i prezime, telefon i email adresu.');
+      setStatus('Molimo unesite sve podatke: ime i prezime, telefon i email.');
       return;
     }
-
-    const orders = porudzbina.map(p => `${p.ime} (${p.gramaza}) - ${p.cena} RSD`).join('\n');
-    const totalPrice = porudzbina.reduce((acc, item) => acc + item.cena, 0);
 
     const templateParams = {
       order_id: Math.floor(Math.random() * 100000),
       imeprezime: imeprezime.trim(),
       telefon: telefon.trim(),
       email: email.trim(),
-      orders: orders,
-      price: totalPrice
+      orders: porudzbina.map(p => `${p.ime} (${p.gramaza}) - ${p.cena} RSD`).join('\n'),
+      price: porudzbina.reduce((acc, item) => acc + item.cena, 0)
     };
 
-    emailjs.send('service_nw0o8sd', 'template_2a2f5sr', templateParams, 'OZIzXvYjWtayN02p1')
+    emailjs.send(
+      'service_nw0o8sd',        // <-- TVOJ SERVICE ID
+      'template_2a2f5sr',       // <-- TVOJ TEMPLATE ID
+      templateParams,
+      'OZIzXvYjWtayN02p1'       // <-- TVOJ USER (PUBLIC) KEY
+    )
       .then(() => {
         setStatus('Narudžbina je uspešno poslata!');
         setPorudzbina([]);
-        setImeprezime('');
+        setImePrezime('');
         setTelefon('');
         setEmail('');
       })
@@ -113,7 +117,7 @@ export default function App() {
                   <option value="50g">50g - 400 RSD</option>
                 </select>
               </div>
-              <p className={`text-xs mt-1 ${p.status === 'Dostupno' ? 'text-green-600' : p.status === 'Uskoro dostupno' ? 'text-yellow-600' : 'text-red-500'}`}>
+              <p className={`text-xs mt-1 ${p.status === 'Dostupno' ? 'text-green-600' : (p.status === 'Uskoro dostupno' ? 'text-yellow-600' : 'text-red-500')}`}>
                 {p.status}
               </p>
               <button
@@ -128,7 +132,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-10 max-w-xl mx-auto">
         <h2 className="text-2xl font-semibold mb-3">🛒 Tvoja narudžbina</h2>
         {porudzbina.length === 0 ? (
           <p className="text-sm italic">Još uvek nema dodatih proizvoda.</p>
@@ -148,31 +152,33 @@ export default function App() {
           </ul>
         )}
 
-        {/* POLJA ZA UNOS */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="mt-6">
+          <label htmlFor="imeprezime" className="block mb-1 font-medium">Ime i prezime:</label>
           <input
+            id="imeprezime"
             type="text"
             value={imeprezime}
-            onChange={e => setImeprezime(e.target.value)}
-            className="p-2 border border-green-400 rounded"
+            onChange={e => setImePrezime(e.target.value)}
+            className="w-full p-2 border border-green-400 rounded mb-2"
             placeholder="Ime i prezime"
-            required
           />
+          <label htmlFor="telefon" className="block mb-1 font-medium">Telefon:</label>
           <input
-            type="tel"
+            id="telefon"
+            type="text"
             value={telefon}
             onChange={e => setTelefon(e.target.value)}
-            className="p-2 border border-green-400 rounded"
-            placeholder="Telefon"
-            required
+            className="w-full p-2 border border-green-400 rounded mb-2"
+            placeholder="060 1234567"
           />
+          <label htmlFor="email" className="block mb-1 font-medium">Email:</label>
           <input
+            id="email"
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="p-2 border border-green-400 rounded"
-            placeholder="Email"
-            required
+            className="w-full p-2 border border-green-400 rounded"
+            placeholder="primer@domen.com"
           />
         </div>
 
