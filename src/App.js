@@ -2,18 +2,26 @@ import emailjs from '@emailjs/browser';
 import { useState } from 'react';
 
 export default function App() {
-  // Dodaj stanja za nova polja
   const [porudzbina, setPorudzbina] = useState([]);
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
   const [imeprezime, setImeprezime] = useState('');
   const [telefon, setTelefon] = useState('');
 
-  // ... tvoji proizvodi ...
+  // *** SVIH 12 BILJAKA, status: Dostupno ili Uskoro dostupno ***
   const proizvodi = [
     { ime: 'Brokoli', status: 'Dostupno', slika: 'brokoli.jpg' },
     { ime: 'Bosiljak', status: 'Uskoro dostupno', slika: 'bosiljak.jpg' },
-    // ... ostale biljke ...
+    { ime: 'Cvekla', status: 'Dostupno', slika: 'cvekla.jpg' },
+    { ime: 'Kineska rotkvica', status: 'Dostupno', slika: 'kineska rotkvica.jpg' },
+    { ime: 'Rukola', status: 'Dostupno', slika: 'rukola.jpg' },
+    { ime: 'Lan', status: 'Uskoro dostupno', slika: 'lan.jpg' },
+    { ime: 'Vlašac', status: 'Dostupno', slika: 'vlašac.jpg' },
+    { ime: 'Grašak', status: 'Uskoro dostupno', slika: 'grašak.jpg' },
+    { ime: 'Lucerka', status: 'Dostupno', slika: 'lucerka.jpg' },
+    { ime: 'Šargarepa', status: 'Uskoro dostupno', slika: 'šargarepa.jpg' },
+    { ime: 'Korijander', status: 'Dostupno', slika: 'korijander.jpg' },
+    { ime: 'Slačica', status: 'Dostupno', slika: 'slačica.jpg' },
   ];
 
   const [odabranaGramaza, setOdabranaGramaza] = useState({});
@@ -72,13 +80,25 @@ export default function App() {
 
   return (
     <div className="p-4 min-h-screen bg-[#fdf3e7] text-green-800 font-sans">
-      {/* ... tvoj header ... */}
+      <header className="mb-8 text-center">
+        <img
+          src="/logo.jpg"
+          alt="Stellagreens logo"
+          className="mx-auto w-60 h-auto mb-2"
+        />
+        <p className="text-sm text-green-600">Sveže mikrobilje iz lokalne proizvodnje</p>
+      </header>
+
       <section>
         <h2 className="text-2xl font-semibold mb-4">Naša ponuda</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {proizvodi.map((p, i) => (
             <div key={i} className="border border-green-100 rounded-2xl bg-white shadow p-4">
-              <img src={`/images/${p.slika}`} alt={p.ime} className="w-full h-32 object-cover rounded-xl mb-2" />
+              <img
+                src={`/images/${p.slika}`}
+                alt={p.ime}
+                className="w-full h-32 object-cover rounded-xl mb-2"
+              />
               <h3 className="text-lg font-bold mb-1">{p.ime}</h3>
               <div className="mb-1">
                 <label className="mr-2 font-medium">Gramaža:</label>
@@ -117,7 +137,10 @@ export default function App() {
             {porudzbina.map((item, i) => (
               <li key={i} className="flex items-center justify-between">
                 <span>{item.ime} - {item.gramaza} - {item.cena} RSD</span>
-                <button onClick={() => ukloniProizvod(i)} className="text-red-600 text-xs hover:underline">
+                <button
+                  onClick={() => ukloniProizvod(i)}
+                  className="text-red-600 text-xs hover:underline"
+                >
                   Ukloni proizvod
                 </button>
               </li>
@@ -155,7 +178,10 @@ export default function App() {
 
         {porudzbina.length > 0 && (
           <div className="text-center mt-4">
-            <button onClick={posaljiNarudzbinu} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full shadow">
+            <button
+              onClick={posaljiNarudzbinu}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full shadow"
+            >
               Pošalji narudžbinu
             </button>
             {status && <p className="mt-2 text-sm text-green-800">{status}</p>}
