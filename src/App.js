@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 
 const EMAILJS_SERVICE_ID = "service_nw0o8sd";
 const EMAILJS_TEMPLATE_ID = "template_2a2f5sr";
 const EMAILJS_PUBLIC_KEY = "OZIzXvYjWtayN02p1";
+const PLACEHOLDER_IMG = "/images/placeholder.jpg"; // koristimo ako slika ne postoji
 
 export function calcUkupno(items) {
   return items.reduce((s, i) => s + (Number(i.cena) || 0), 0);
@@ -14,6 +15,8 @@ export function formatOrders(items) {
 }
 
 export default function App() {
+  const narudzbinaRef = useRef(null);
+
   const [porudzbina, setPorudzbina] = useState([]);
   const [status, setStatus] = useState("");
   const [saljeSe, setSaljeSe] = useState(false);
@@ -49,6 +52,10 @@ export default function App() {
     const gramaza = odabranaGramaza[proizvod.ime] || "30g";
     const item = { ...proizvod, gramaza, cena: cene[gramaza] };
     setPorudzbina((prev) => [...prev, item]);
+    // skrol do narudžbine da korisnik vidi dugme
+    setTimeout(() => {
+      narudzbinaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   };
 
   const ukloniProizvod = (index) => {
@@ -118,6 +125,13 @@ export default function App() {
       <header className="mb-8 text-center">
         <img src="/logo.jpg" alt="Stellagreens logo" className="mx-auto w-60 h-auto mb-2" />
         <p className="text-sm text-green-600">Sveže mikrobilje iz lokalne proizvodnje</p>
+        {/* Brzi link do korpe */}
+        <button
+          onClick={() => narudzbinaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          className="mt-3 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full"
+        >
+          Idi na narudžbinu
+        </button>
       </header>
 
       <section>
@@ -125,7 +139,15 @@ export default function App() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {proizvodi.map((p, i) => (
             <div key={i} className="border border-green-100 rounded-2xl bg-white shadow p-4">
-              <img src={`/images/${p.slika}`} alt={p.ime} className="w-full h-32 object-cover rounded-xl mb-2" />
+              <img
+                src={`/images/${p.slika}`}
+                alt={p.ime}
+                onError={(e) => {
+                  e.currentTarget.src = PLACEHOLDER_IMG; // fallback ako slika ne postoji
+                  e.currentTarget.onerror = null;
+                }}
+                className="w-full h-32 object-cover rounded-xl mb-2 bg-green-50"
+              />
               <h3 className="text-lg font-bold mb-1">{p.ime}</h3>
               <div className="mb-1">
                 <label className="mr-2 font-medium">Gramaža:</label>
@@ -153,6 +175,7 @@ export default function App() {
                 onClick={() => dodajUkorpu(p)}
                 className="mt-3 text-sm bg-green-200 hover:bg-green-300 text-green-900 px-3 py-1 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={p.status !== "Dostupno"}
+                title={p.status !== "Dostupno" ? "Proizvod još nije dostupan" : "Dodaj u narudžbinu"}
               >
                 Dodaj u narudžbinu
               </button>
@@ -161,10 +184,10 @@ export default function App() {
         </div>
       </section>
 
-      <section className="mt-10 max-w-xl mx-auto">
+      <section ref={narudzbinaRef} className="mt-10 max-w-xl mx-auto">
         <h2 className="text-2xl font-semibold mb-3">🛒 Tvoja narudžbina</h2>
         {porudzbina.length === 0 ? (
-          <p className="text-sm italic">Još uvek nema dodatih proizvoda.</p>
+          <p className="text-sm italic">Još uvek nema dodatih proizvoda. Dodaj bar jedan proizvod iz ponude.</p>
         ) : (
           <>
             <ul className="list-disc pl-4 space-y-1">
@@ -229,12 +252,56 @@ export default function App() {
             onClick={posaljiNarudzbinu}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full shadow disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={saljeSe || porudzbina.length === 0}
+            title={porudzbina.length === 0 ? "Dodaj bar jedan proizvod u korpu" : "Pošalji narudžbinu"}
           >
             {saljeSe ? "Šaljem..." : "Pošalji narudžbinu"}
           </button>
+          {porudzbina.length === 0 && (
+            <p className="mt-2 text-xs text-green-700">Dodaj proizvod iz ponude iznad da se aktivira dugme.</p>
+          )}
           {status && <p className="mt-2 text-sm text-green-800 whitespace-pre-line">{status}</p>}
         </div>
       </section>
+
+      {/* Sticky mini-korpa da se uvek vidi dugme za naručivanje */}
+      <div className="fixed bottom-4 right-4">
+        <button
+          onClick={() => narudzbinaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          className="shadow-lg rounded-full px-4 py-2 bg-white border border-green-300 text-green-700 hover:bg-green-50"
+          title="Otvori narudžbinu"
+        >
+          🛒 {porudzbina.length} | {ukupno} RSD
+        </button>
+      </div>
     </div>
   );
+}
+
+/* ==========================================================
+   INLINE TESTOVI
+   ========================================================== */
+if (typeof window !== "undefined" && !window.__STELLA_TESTED__) {
+  window.__STELLA_TESTED__ = true;
+  try {
+    console.assert(calcUkupno([{ cena: 250 }, { cena: 400 }]) === 650, "calcUkupno treba da vrati 650");
+    console.assert(calcUkupno([]) === 0, "calcUkupno prazno treba da vrati 0");
+
+    const sample = [
+      { ime: "Brokoli", gramaza: "30g", cena: 250 },
+      { ime: "Bosiljak", gramaza: "50g", cena: 400 },
+    ];
+    const formatted = formatOrders(sample);
+    console.assert(
+      formatted.includes("Brokoli (30g) - 250 RSD") && formatted.includes("Bosiljak (50g) - 400 RSD"),
+      "formatOrders treba da sadrži ispravne stavke"
+    );
+    console.assert(formatted.split("\n").length === 2, "formatOrders treba da ima 2 reda za 2 stavke");
+
+    const weird = formatOrders([{ ime: "X", gramaza: "30g", cena: 0 }]);
+    console.assert(weird === "X (30g) - 0 RSD", "formatOrders: cena 0 treba da bude podržana");
+
+    console.log("[StellaGreens] Inline testovi prošli ✅");
+  } catch (e) {
+    console.error("[StellaGreens] Greška u inline testovima", e);
+  }
 }
