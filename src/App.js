@@ -17,6 +17,15 @@ function sanitizeEmail(value) {
   return String(value || "").replace(/[\r\n]/g, "").trim();
 }
 
+function extractEmail(input) {
+  const m = String(input || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return m ? m[0] : "";
+}
+
+function isEmailValidStrict(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export function calcUkupno(items) {
   return items.reduce((s, i) => s + (Number(i.cena) || 0), 0);
 }
@@ -41,15 +50,15 @@ export default function App() {
     { ime: "Brokoli", status: "Dostupno", slika: "brokoli.jpg" },
     { ime: "Bosiljak", status: "Dostupno", slika: "bosiljak.jpg" },
     { ime: "Cvekla", status: "Dostupno", slika: "cvekla.jpg" },
-    { ime: "Kineska rotkvica", status: "Uskoro dostupno", slika: "kineska rotkvica.jpg" },
+    { ime: "Kineska rotkvica", status: "Uskoro dostupno", slika: "kineska_rotkvica.jpg" },
     { ime: "Rukola", status: "Dostupno", slika: "rukola.jpg" },
     { ime: "Lan", status: "Uskoro dostupno", slika: "lan.jpg" },
-    { ime: "Vlašac", status: "Dostupno", slika: "vlašac.jpg" },
-    { ime: "Grašak", status: "Uskoro dostupno", slika: "grašak.jpg" },
+    { ime: "Vlašac", status: "Dostupno", slika: "vlasac.jpg" },
+    { ime: "Grašak", status: "Uskoro dostupno", slika: "grasak.jpg" },
     { ime: "Lucerka", status: "Dostupno", slika: "lucerka.jpg" },
-    { ime: "Šargarepa", status: "Uskoro dostupno", slika: "šargarepa.jpg" },
+    { ime: "Šargarepa", status: "Uskoro dostupno", slika: "sargarepa.jpg" },
     { ime: "Korijander", status: "Dostupno", slika: "korijander.jpg" },
-    { ime: "Slačica", status: "Dostupno", slika: "slačica.jpg" },
+    { ime: "Slačica", status: "Dostupno", slika: "slacica.jpg" },
   ];
 
   const cene = { "30g": 250, "50g": 400 };
@@ -79,8 +88,11 @@ export default function App() {
     if (!imeprezime.trim()) greske.push("unesite ime i prezime");
     const telOk = /[0-9]{6,}/.test(telefon.replace(/\D/g, ""));
     if (!telOk) greske.push("unesite ispravan telefon");
-    const mailOk = /[^@\s]+@[^@\s]+\.[^@\s]+/.test(email);
+
+    const cleanForCheck = extractEmail(email);
+    const mailOk = isEmailValidStrict(cleanForCheck);
     if (!mailOk) greske.push("unesite ispravan email");
+
     if (greske.length) return `Molimo ${greske.join(", ")}.`;
     return "";
   }
@@ -91,16 +103,17 @@ export default function App() {
     if (v) { setStatus(v); return; }
 
     const order_id = `${Date.now()}`;
+    const cleanEmail = sanitizeEmail(extractEmail(email));
     const templateParams = {
       // adresiranje
       to_email: RECIPIENT_EMAIL,        // PRIMALAC: fiksno tvoj email
-      reply_to: sanitizeEmail(email),   // Reply-To: kupac
+      reply_to: cleanEmail,             // Reply-To: kupac
 
       // sadržaj
       order_id,
       imeprezime: imeprezime.trim(),
       telefon: telefon.trim(),
-      email: sanitizeEmail(email),
+      email: cleanEmail,
       orders: formatOrders(porudzbina),
       price: ukupno,
     };
@@ -277,6 +290,8 @@ if (typeof window !== "undefined" && !window.__STELLA_TESTED__) {
     console.assert(formatted.split("\n").length === 2, "formatOrders treba da ima 2 reda za 2 stavke");
 
     console.assert(sanitizeEmail(" test\nuser@example.com ") === "testuser@example.com", "sanitizeEmail treba da ukloni CR/LF i razmake");
+    console.assert(extractEmail("Ime Prezime <user@example.com>") === "user@example.com", "extractEmail treba da izvuče email iz 'Name <email>'");
+    console.assert(isEmailValidStrict("user@example.com") === true && isEmailValidStrict("user@example,com") === false, "isEmailValidStrict treba da bude stroži");
 
     console.log("[StellaGreens] Inline testovi prošli ✅");
   } catch (e) {
